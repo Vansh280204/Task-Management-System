@@ -12,6 +12,9 @@ router.post('/register', userController.createUser);
 //Get All User
 router.get('/getAll', authenticate, userController.getAllUser);
 
+// Get currently logged-in user's profile
+router.get('/me', authenticate, userController.getMyProfile);
+
 //Get User's By Id
 router.get('/id/:id', authenticate, userController.getById);
 

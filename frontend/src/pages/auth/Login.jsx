@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Auth.css";
 import { loginUser } from "../../services/authService";
+import { useContext } from "react";
+import AuthContext from "../../context/AuthContext";
 
 function Login() {
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     });
+    const { login } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -32,6 +35,7 @@ function Login() {
     
             try{
                 const result = await loginUser(formData);
+                login(result.data.token, result.data.user);
                 setSuccess(result.message);
             }catch(error){
                 setError(error.message);

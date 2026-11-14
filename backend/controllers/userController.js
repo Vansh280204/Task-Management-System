@@ -10,15 +10,33 @@ const createUser = async (req, res) => {
                 data:user
             });
         }catch(error){
-            if (error.code === 11000) { // Mongo duplicate key
-                return res.status(409).json({ success: false, message: "User already exists" });
+            if (error.code === 11000) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Email or Phone already exists"
+                });
             }
+
+            if (
+                error.message === "Email Already Register" ||
+                error.message === "Phone Already Register"
+            ) {
+                return res.status(409).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
             if (error.name === "ValidationError") {
-                return res.status(400).json({ success: false, message: error.message });
+                return res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             }
-            res.status(500).json({ 
-                success:false,
-                message: "Error Registering User", error: error.message 
+
+            res.status(500).json({
+                success: false,
+                message: "Error Registering User"
             });
         }
 };
@@ -36,6 +54,29 @@ const getAllUser = async (req, res) => {
         res.status(500).json({
             success:false,
             message: "Error Retriving User", error: error.message
+        });
+    }
+};
+
+//Get My Profile
+const getMyProfile = async (req, res) => {
+    try{
+        const user = await userService.getById(req.user.id);
+        if(!user){
+            return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+        }
+        res.status(200).json({
+            success:true,
+            message:"Profile Fetched Successfully",
+            data:user
+        });
+    }catch(error){
+        res.status(500).json({
+            success:false,
+            message: "Error While Fetching Profile", error: error.message
         });
     }
 };
@@ -151,4 +192,4 @@ const changePassword = async (req, res) => {
     }
 };
 
-module.exports = {createUser, getAllUser, getById, getByName, getByEmail, updateById, changeActiveById, changePassword};
+module.exports = {createUser, getAllUser, getMyProfile, getById, getByName, getByEmail, updateById, changeActiveById, changePassword};
